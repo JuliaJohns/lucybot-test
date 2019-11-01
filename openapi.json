@@ -1,390 +1,123 @@
 {
-  "openapi": "3.0.2",
+  "swagger": "2.0",
   "info": {
-    "title": "EDGE Connect Data API",
-    "version": "0.53.0",
-    "description": "![Hypertherm Logo](art/LOGO_HYP_4Color.jpg)\n\nThis internal Hypertherm REST web service provides status and diagnostic information about the EDGE Connect CNC based cutting system you are presently using.\n\nThis document refers to the 10.11 release of Phoenix. Future versions may change the specification.",
-    "contact": {
-      "email": "713ee467.Hypertherm.onmicrosoft.com@amer.teams.ms"
+    "title": "XPR True Hole Conversion",
+    "version": "1.0",
+    "description": "Use this API to convert any eligible holes in a single part or nest of parts into True Holes.\n\n  API Steps:\n\n    1. Upload part and settings files\n\n    2. Convert\n\n    3. Download converted file\n\n[See workflow](/th-workflow)"
+  },
+  "host": "api.hypertherm.com",
+  "basePath": "/xpr-true-hole-conversion",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "name": "Ocp-Apim-Subscription-Key",
+      "in": "header"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "name": "subscription-key",
+      "in": "query"
     }
   },
-  "servers": [
+  "security": [
     {
-      "url": "http://localhost:3579",
-      "description": "On-CNC endpoint for production use."
-    }
-  ],
-  "tags": [
-    {
-      "name": "Functional Test",
-      "description": "Returns the status of the EDGE Connect Data server as Up (operational) or Down (inoperable)."
+      "apiKeyHeader": []
     },
     {
-      "name": "Cutting System",
-      "description": "Returns all available diagnostic information about the CNC, current job, system errors, and XPR (if applicable)."
-    },
-    {
-      "name": "CNC",
-      "description": "Returns the CNC status and user-specified configuration details."
-    },
-    {
-      "name": "Job",
-      "description": "Returns information about the currently loaded part and the progress of cutting that part."
-    },
-    {
-      "name": "System errors",
-      "description": "Returns the CNC and tool errors shown in the System Error Watch Window in Phoenix."
-    },
-    {
-      "name": "XPR",
-      "description": "Returns current and recent diagnostic information (alerts, faults, errors, and failures) from the XPR plasma power supply, if applicable."
+      "apiKeyQuery": []
     }
   ],
   "paths": {
-    "/hypertherm": {
-      "get": {
-        "tags": [
-          "Functional Test"
+    "/upload": {
+      "post": {
+        "description": "Upload your part program and machine settings one at a time.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
+        "operationId": "5af3156673e0f584ca0ee9c0",
+        "summary": "1. Upload",
+        "parameters": [
+          {
+            "name": "uploadBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UploadBody"
+            }
+          }
         ],
-        "description": "Returns the status of the EDGE Connect Data server as Up (operational) or Down (inoperable).",
-        "operationId": "FunctionalTest",
+        "consumes": [
+          "text/plain"
+        ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/ServerStatus"
+            "description": "File uploaded successfully.\n\nThe response contains the unique file ID needed for the Convert step (such as *3e882a4259b44bb79a9ccdbbbea4bb9g*).\n\nCopy this file ID for the Convert step."
           },
-          "500": {
-            "description": "The EDGE Connect Data server is not operational right now. The server may be rebooting. Try again in a few minutes."
+          "400": {
+            "description": "Bad request (Empty file)"
           }
         }
       }
     },
-    "/hypertherm/cuttingsystem": {
-      "description": "Provides information about the entire cutting system including the CNC, Job information, and XPR (if applicable).",
-      "get": {
-        "tags": [
-          "Cutting System"
+    "/convert": {
+      "post": {
+        "description": "Convert the uploaded part file into a True Hole file by passing in the Part File ID and Settings File ID.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
+        "operationId": "5af31566ae4ba67ebb371b74",
+        "summary": "2. Convert",
+        "parameters": [
+          {
+            "name": "apiConvertPostRequest",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ApiConvertPostRequest"
+            },
+            "description": "After clicking **Send**, the response will contain the True Hole File ID needed to download the converted file."
+          }
+        ],
+        "consumes": [
+          "application/json"
         ],
         "responses": {
           "200": {
-            "$ref": "#components/responses/CuttingSystemGood"
-          },
-          "500": {
-            "description": "Failed to gather information about the cutting system."
+            "description": "File converted successfully.\n\nThe response contains the True Hole file ID needed for the Download step (such as *5e992a4259b11bb68a8ccdbbbea4bb9g*).\n\nCopy this file ID for the Download step."
           }
         }
       }
     },
-    "/hypertherm/job": {
-      "description": "Returns information about the currently loaded part and the progress of cutting that part.",
-      "get": {
-        "tags": [
-          "Job"
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#components/responses/JobGood"
-          },
-          "500": {
-            "description": "Failed to gather information about the currently loaded part."
+    "/download": {
+      "post": {
+        "description": "Download the True Hole part program by passing the True Hole File ID.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
+        "operationId": "5af31566b8684c55348d5b77",
+        "summary": "3. Download",
+        "parameters": [
+          {
+            "name": "downloadBody",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/DownloadBody"
+            }
           }
-        }
-      }
-    },
-    "/hypertherm/edgeconnect": {
-      "description": "Returns the CNC status and user-specified configuration details.",
-      "get": {
-        "tags": [
-          "CNC"
+        ],
+        "consumes": [
+          "application/json"
         ],
         "responses": {
           "200": {
-            "description": "Coming soon."
-          },
-          "500": {
-            "description": "Coming soon."
-          }
-        }
-      }
-    },
-    "/hypertherm/systemerror": {
-      "description": "Returns the CNC and tool errors shown in the System Error Watch Window in Phoenix.",
-      "get": {
-        "tags": [
-          "System errors"
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#components/responses/JobGood - COMING SOON"
-          },
-          "500": {
-            "description": "COMING SOON."
-          }
-        }
-      }
-    },
-    "/hypertherm/xpr": {
-      "description": "Returns XPR diagnostic information (alerts, faults, errors, and failures).",
-      "get": {
-        "tags": [
-          "XPR"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully gathered data from the XPR plasma power supply."
+            "description": "File downloaded successfully."
           }
         }
       }
     }
   },
-  "components": {
-    "requestBodies": {
-      "XprPostDiagnostic": {
-        "description": "This form of the request body for the /hypertherm/xpr POST endpoint is used to get diagnostic information about the state of the XPR power supply.",
-        "required": true,
-        "content": {
-          "xpr-request": {
-            "schema": {
-              "type": "object",
-              "description": "Cannonical method for requesting data from an XPR.",
-              "properties": {
-                "target": {
-                  "description": "Statement this is a diagnostic information request.",
-                  "type": "string",
-                  "enum": [
-                    "GetItem"
-                  ]
-                },
-                "items": {
-                  "description": "A list of the groupings of diagnostic values possible from the XPR.\nNote: As of 10.9 only the first element is respected",
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minItems": 1,
-                    "enum": [
-                      "PlasmaPowerSupply",
-                      "GasSystem",
-                      "Log",
-                      "Operate",
-                      "Other",
-                      "All",
-                      "GetAllItems"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+  "definitions": {
+    "UploadBody": {
+      "example": "[Paste content to be uploaded here.]"
     },
-    "responses": {
-      "ServerStatusGood": {
-        "description": "The EDGE Connect Data Server is operational (up).",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": "up"
-              }
-            }
-          }
-        }
-      }
+    "DownloadBody": {
+      "example": "{\n  \"fileID\": \"[Paste converted file ID to be downloaded here.]\"\n}"
     },
-    "[object Object]": null,
-    "schemas": {
-      "FieldBusNetworkStateAll": {
-        "title": "Field Bus Network State",
-        "description": "The state of the EtherCAT network this XPR is on when the network is either up or down.",
-        "type": "string",
-        "default": "UNKNOWN",
-        "enum": [
-          "OFFLINE",
-          "ONLINE",
-          "PREOPERATIONAL",
-          "UNKNOWN",
-          "FAULTED",
-          "UPDATE",
-          "SAFE",
-          "OPERATIONAL"
-        ]
-      },
-      "FieldBusNetworkStateGood": {
-        "title": "Field Bus Network State (Network Operational)",
-        "description": "The state of the EtherCAT network this XPR is on when the network is up.",
-        "type": "string",
-        "default": "UNKNOWN",
-        "enum": [
-          "SAFE",
-          "OPERATIONAL"
-        ]
-      },
-      "FieldBusNetworkStateBad": {
-        "title": "Field Bus Network State (Network Down)",
-        "description": "The state of the EtherCAT network this XPR is on when the network is down.",
-        "type": "string",
-        "default": "UNKNOWN",
-        "enum": [
-          "OFFLINE",
-          "ONLINE",
-          "PREOPERATIONAL",
-          "UNKNOWN",
-          "FAULTED",
-          "UPDATE"
-        ]
-      },
-      "CncInformation": {
-        "title": "CNC Information",
-        "description": "Object representing the state of a CNC",
-        "type": "object",
-        "properties": {
-          "State": {
-            "$ref": "#components/schemas/CncStateType"
-          },
-          "Mode": {
-            "$ref": "#components/schemas/CncModeType"
-          },
-          "AwaitingOperatorInput": {
-            "$ref": "#components/schemas/CncAwaitingOperatorInputType"
-          }
-        }
-      },
-      "JobInformation": {
-        "title": "Job Information",
-        "description": "Object representing the information and status of a Job loaded on the CNC.",
-        "type": "object",
-        "properties": {
-          "EventLog": {
-            "title": "",
-            "description": "Array logging modifications to and executions steps of the current job..",
-            "type": "array",
-            "items": {
-              "$ref": "#components/schemas/JobUpdate"
-            }
-          },
-          "Messages": {
-            "title": "Job Information Message Array",
-            "description": "Array of messages pertaining to the loading or execution of a job",
-            "type": "array",
-            "items": {
-              "$ref": "#components/schemas/JobUpdate"
-            }
-          },
-          "MachineCodeExecutionLog": {
-            "title": "Machine Code Execution Log",
-            "description": "Array of Job Updates detailing the execution of lines of the current job.",
-            "type": "array",
-            "items": {
-              "$ref": "#components/schemas/JobUpdate"
-            }
-          }
-        }
-      },
-      "JobUpdate": {
-        "title": "Job Update",
-        "description": "Object representing ",
-        "type": "object",
-        "required": [
-          "EventType",
-          "Timestamp"
-        ],
-        "properties": {
-          "EventType": {
-            "$ref": "#components/schemas/JobUpdateType"
-          },
-          "Timestamp": {
-            "description": "Timestamp using data source-local time (most frequently the clock on the CNC) which the event occurred.",
-            "type": "date-time",
-            "example": "2018-11-1T16:39:02-05:00"
-          },
-          "Code": {
-            "description": "Line or lines of EIA code associated with the update.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "LineNumber": {
-            "title": "Executed code line number",
-            "description": "Line number of the line of code executed. One-indexed.",
-            "type": "integer"
-          }
-        }
-      },
-      "CncStateType": {
-        "title": "CNC State Type",
-        "description": "Property describing the state of the CNC",
-        "type": "string",
-        "enum": [
-          "Aligning job on plate",
-          "Awaiting Operator Input",
-          "Booting CNC",
-          "CNC Error",
-          "Homing Table",
-          "Idle",
-          "Manual Motion",
-          "Paused",
-          "Crash of Phoenix App",
-          "Running Programmed Motion",
-          "Resume Requested",
-          "Returning to Start",
-          "Ripping",
-          "Setting Process",
-          "Start Requested",
-          "Stop Requested"
-        ],
-        "default": "Idle"
-      },
-      "JobUpdateType": {
-        "title": "Job Update Type",
-        "description": "Type of the message of this Job Update",
-        "type": "string",
-        "enum": [
-          "No Action",
-          "Cancelled",
-          "Completed",
-          "Code Modified",
-          "Duration Estimate Modified",
-          "Error",
-          "Loaded",
-          "Machine Code Executed",
-          "Name Changed",
-          "Nest Modified",
-          "Paused",
-          "Resumed",
-          "Returned to Start After Completion",
-          "Saved",
-          "Cut Speed Changed",
-          "Started",
-          "Status Message"
-        ],
-        "default": "Loaded"
-      },
-      "CncModeType": {
-        "title": "CNC Mode Type",
-        "description": "Property describing the mode of operation the CNC is in.",
-        "type": "string",
-        "enum": [
-          "Manual Motion",
-          "Programmed Motion",
-          "Other",
-          "Rip",
-          "Setup"
-        ],
-        "default": "Manual Motion"
-      },
-      "CncAwaitingOperatorInputType": {
-        "title": "CNC Awaiting Operator Input Type",
-        "description": "Property describing if the CNC is inoperative while awaiting operator input and, if so, the cause of the inoperability.",
-        "type": "string",
-        "enum": [
-          "Ready to Cut Pop-up",
-          "Return to Start Pop-up",
-          "Not Requested"
-        ],
-        "default": "Not Requested"
-      }
+    "ApiConvertPostRequest": {
+      "example": "{\n  \"partFileID\": \"[Paste part file ID to be converted here.]\",\n  \"settingsFileID\": \"[Paste settings file ID here.]\"\n}"
     }
-  }
+  },
+  "tags": []
 }
