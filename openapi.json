@@ -1,123 +1,167 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "title": "XPR True Hole Conversion",
-    "version": "1.0",
-    "description": "Use this API to convert any eligible holes in a single part or nest of parts into True Holes.\n\n  API Steps:\n\n    1. Upload part and settings files\n\n    2. Convert\n\n    3. Download converted file\n\n[See workflow](/th-workflow)"
-  },
-  "host": "api.hypertherm.com",
-  "basePath": "/xpr-true-hole-conversion",
-  "schemes": [
-    "https"
-  ],
-  "securityDefinitions": {
-    "apiKeyHeader": {
-      "type": "apiKey",
-      "name": "Ocp-Apim-Subscription-Key",
-      "in": "header"
-    },
-    "apiKeyQuery": {
-      "type": "apiKey",
-      "name": "subscription-key",
-      "in": "query"
-    }
-  },
-  "security": [
-    {
-      "apiKeyHeader": []
-    },
-    {
-      "apiKeyQuery": []
-    }
-  ],
-  "paths": {
-    "/upload": {
-      "post": {
-        "description": "Upload your part program and machine settings one at a time.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
-        "operationId": "5af3156673e0f584ca0ee9c0",
-        "summary": "1. Upload",
-        "parameters": [
-          {
-            "name": "uploadBody",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/UploadBody"
-            }
-          }
-        ],
-        "consumes": [
-          "text/plain"
-        ],
-        "responses": {
-          "200": {
-            "description": "File uploaded successfully.\n\nThe response contains the unique file ID needed for the Convert step (such as *3e882a4259b44bb79a9ccdbbbea4bb9g*).\n\nCopy this file ID for the Convert step."
-          },
-          "400": {
-            "description": "Bad request (Empty file)"
-          }
-        }
-      }
-    },
-    "/convert": {
-      "post": {
-        "description": "Convert the uploaded part file into a True Hole file by passing in the Part File ID and Settings File ID.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
-        "operationId": "5af31566ae4ba67ebb371b74",
-        "summary": "2. Convert",
-        "parameters": [
-          {
-            "name": "apiConvertPostRequest",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/ApiConvertPostRequest"
-            },
-            "description": "After clicking **Send**, the response will contain the True Hole File ID needed to download the converted file."
-          }
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "File converted successfully.\n\nThe response contains the True Hole file ID needed for the Download step (such as *5e992a4259b11bb68a8ccdbbbea4bb9g*).\n\nCopy this file ID for the Download step."
-          }
-        }
-      }
-    },
-    "/download": {
-      "post": {
-        "description": "Download the True Hole part program by passing the True Hole File ID.\n\n&nbsp; \n\n<font color=\"red\" size=\"2\">(Query parameters not required)</font>",
-        "operationId": "5af31566b8684c55348d5b77",
-        "summary": "3. Download",
-        "parameters": [
-          {
-            "name": "downloadBody",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/DownloadBody"
-            }
-          }
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "File downloaded successfully."
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "UploadBody": {
-      "example": "[Paste content to be uploaded here.]"
-    },
-    "DownloadBody": {
-      "example": "{\n  \"fileID\": \"[Paste converted file ID to be downloaded here.]\"\n}"
-    },
-    "ApiConvertPostRequest": {
-      "example": "{\n  \"partFileID\": \"[Paste part file ID to be converted here.]\",\n  \"settingsFileID\": \"[Paste settings file ID here.]\"\n}"
-    }
-  },
-  "tags": []
-}
+openapi: "3.0.0"
+info:
+  title: Simple API overview
+  version: 2.0.0
+paths:
+  /:
+    get:
+      operationId: listVersionsv2
+      summary: List API versions
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json:
+              examples: 
+                foo:
+                  value: {
+                    "versions": [
+                        {
+                            "status": "CURRENT",
+                            "updated": "2011-01-21T11:33:21Z",
+                            "id": "v2.0",
+                            "links": [
+                                {
+                                    "href": "http://127.0.0.1:8774/v2/",
+                                    "rel": "self"
+                                }
+                            ]
+                        },
+                        {
+                            "status": "EXPERIMENTAL",
+                            "updated": "2013-07-23T11:33:21Z",
+                            "id": "v3.0",
+                            "links": [
+                                {
+                                    "href": "http://127.0.0.1:8774/v3/",
+                                    "rel": "self"
+                                }
+                            ]
+                        }
+                    ]
+                 }
+        '300':
+          description: |-
+            300 response
+          content:
+            application/json: 
+              examples: 
+                foo:
+                  value: |
+                   {
+                    "versions": [
+                          {
+                            "status": "CURRENT",
+                            "updated": "2011-01-21T11:33:21Z",
+                            "id": "v2.0",
+                            "links": [
+                                {
+                                    "href": "http://127.0.0.1:8774/v2/",
+                                    "rel": "self"
+                                }
+                            ]
+                        },
+                        {
+                            "status": "EXPERIMENTAL",
+                            "updated": "2013-07-23T11:33:21Z",
+                            "id": "v3.0",
+                            "links": [
+                                {
+                                    "href": "http://127.0.0.1:8774/v3/",
+                                    "rel": "self"
+                                }
+                            ]
+                        }
+                    ]
+                   }
+  /v2:
+    get:
+      operationId: getVersionDetailsv2
+      summary: Show API version details
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json: 
+              examples:
+                foo:
+                  value: {
+                    "version": {
+                      "status": "CURRENT",
+                      "updated": "2011-01-21T11:33:21Z",
+                      "media-types": [
+                          {
+                              "base": "application/xml",
+                              "type": "application/vnd.openstack.compute+xml;version=2"
+                          },
+                          {
+                              "base": "application/json",
+                              "type": "application/vnd.openstack.compute+json;version=2"
+                          }
+                      ],
+                      "id": "v2.0",
+                      "links": [
+                          {
+                              "href": "http://127.0.0.1:8774/v2/",
+                              "rel": "self"
+                          },
+                          {
+                              "href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
+                              "type": "application/pdf",
+                              "rel": "describedby"
+                          },
+                          {
+                              "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+                              "type": "application/vnd.sun.wadl+xml",
+                              "rel": "describedby"
+                          },
+                          {
+                            "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+                            "type": "application/vnd.sun.wadl+xml",
+                            "rel": "describedby"
+                          }
+                      ]
+                    }
+                  }
+        '203':
+          description: |-
+            203 response
+          content:
+            application/json: 
+              examples:
+                foo:
+                  value: {
+                    "version": {
+                      "status": "CURRENT",
+                      "updated": "2011-01-21T11:33:21Z",
+                      "media-types": [
+                          {
+                              "base": "application/xml",
+                              "type": "application/vnd.openstack.compute+xml;version=2"
+                          },
+                          {
+                              "base": "application/json",
+                              "type": "application/vnd.openstack.compute+json;version=2"
+                          }
+                      ],
+                      "id": "v2.0",
+                      "links": [
+                          {
+                              "href": "http://23.253.228.211:8774/v2/",
+                              "rel": "self"
+                          },
+                          {
+                              "href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
+                              "type": "application/pdf",
+                              "rel": "describedby"
+                          },
+                          {
+                              "href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+                              "type": "application/vnd.sun.wadl+xml",
+                              "rel": "describedby"
+                          }
+                      ]
+                    }
+                  }
